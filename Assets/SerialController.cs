@@ -108,8 +108,13 @@ public class SerialController : MonoBehaviour
     }
     void SlideEmbolo(int leitura)
     {
+        if (leitura > 100)
+        {
+            print("favor, recalibrar a seringa");
+            leitura = 100;
+        }
         //0 está para o fim assim como o máximo está para o inicio 
-        embolo.position= (-fimEmbolo.position + inicioEmbolo.position)*leitura / 1022 + fimEmbolo.position;
+        embolo.position= (-fimEmbolo.position + inicioEmbolo.position)*leitura / 100 + fimEmbolo.position;
 
     }
     void OnEnable()
@@ -322,6 +327,7 @@ public class SerialController : MonoBehaviour
     void OnTriggerEnter(Collider collider){                                  //detecta a insercao da seringa
         try{
             SendSerialMessage("P");
+            print("entrei ack");
             seringaDentro = true;
             //ultimaPosicao = transform.position.magnitude;
             ultimaPosicao = transform.position;
@@ -332,6 +338,7 @@ public class SerialController : MonoBehaviour
 
     void OnTriggerExit(Collider collider){                                  //detecta a retirada da seringa
         try{
+            print("Sai ack");
             SendSerialMessage("P");
             seringaDentro = false;
         }
