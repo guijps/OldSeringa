@@ -44,8 +44,12 @@ public class SerialController : MonoBehaviour
     Vector3 posicao;
     float diferenca;
     //bool novaPosicao = true;                                //evita que a co-rotina seja chamada indiscriminadamente
-   
-    
+    [SerializeField]
+    Transform embolo;
+    [SerializeField]
+    Transform fimEmbolo;
+    [SerializeField]
+    Transform inicioEmbolo;
     Vector3 positionInput;
     //public Transform camPivot;
     //float heading = 0;
@@ -55,8 +59,9 @@ public class SerialController : MonoBehaviour
 
     //float ultimaPosicao;
     Vector3 ultimaPosicao;
-
-
+    Vector3 distEmbolo;
+    
+    private Vector3 distEmboloInit;
     [Tooltip("Port name with which the SerialPort object will be created.")]
     public string portName = "COM3";
     string[] portNames = SerialPort.GetPortNames(); 
@@ -97,18 +102,23 @@ public class SerialController : MonoBehaviour
     // ------------------------------------------------------------------------
     void Start()
     {
+        distEmbolo = (fimEmbolo.position - embolo.position).normalized;
+        distEmboloInit = (fimEmbolo.position - embolo.position);
         
+    }
+    void SlideEmbolo(int leitura)
+    {
+        //0 está para o fim assim como o máximo está para o inicio 
+        embolo.position= (-fimEmbolo.position + inicioEmbolo.position)*leitura / 1022 + fimEmbolo.position;
 
     }
-
     void OnEnable()
     {
        string  port = "COM6";
         var serialPort = new SerialPort(port, 9600, 0, 8, StopBits.One);
         serialPort.ReadTimeout = 100;
         serialPort.Open();
-        serialPort.Write("b");
-        serialPort.WriteLine("a");
+   
         
         portaAberta = true;
         portName = port;
@@ -152,57 +162,74 @@ public class SerialController : MonoBehaviour
     // ------------------------------------------------------------------------
     void Update()
     {
+       
+        
        // RespondtoMovementCommands();
         MovementInputs();
 
 
     
-    if(portaAberta){
-        serialThread = new SerialThreadLines(portName, 
-                                             baudRate, 
-                                             reconnectionDelay,
-                                             maxUnreadMessages);
-        thread = new Thread(new ThreadStart(serialThread.RunForever));
-        thread.Start();
-        portaAberta = false;
-        isConnect = true;
-    }
+        if(portaAberta){
+            serialThread = new SerialThreadLines(portName, 
+                                                 baudRate, 
+                                                 reconnectionDelay,
+                                                 maxUnreadMessages);
+            thread = new Thread(new ThreadStart(serialThread.RunForever));
+            thread.Start();
+            portaAberta = false;
+            isConnect = true;
+        }
 
-    if(portaAberta || isConnect){
-        RespondtoCommands();
+        if(portaAberta || isConnect){
+            RespondtoCommands();
         
         
-        if(seringaDentro){
-            //if((Mathf.Abs(ultimaPosicao - transform.position.magnitude)*100) > deslocamentoMinimo){             //com a seringa dentro, checa se foi deslocada num valor 
+            if(seringaDentro){
+                //if((Mathf.Abs(ultimaPosicao - transform.position.magnitude)*100) > deslocamentoMinimo){             //com a seringa dentro, checa se foi deslocada num valor 
             
-            if((Mathf.Abs((ultimaPosicao - transform.position).magnitude)*100) > deslocamentoMinimo){             //com a seringa dentro, checa se foi deslocada num valor 
-                if(seringaDentro){                                                                              //razoavel e manda a mensagem
-                    SendSerialMessage("P");
-                    //ultimaPosicao = transform.position.magnitude;
-                    ultimaPosicao = transform.position;
+                if((Mathf.Abs((ultimaPosicao - transform.position).magnitude)*100) > deslocamentoMinimo){             //com a seringa dentro, checa se foi deslocada num valor 
+                    if(seringaDentro){                                                                              //razoavel e manda a mensagem
+                        SendSerialMessage("P");
+                        //ultimaPosicao = transform.position.magnitude;
+                        ultimaPosicao = transform.position;
+                    }
                 }
             }
-        }
         
-        // If the user prefers to poll the messages instead of receiving them
-        // via SendMessage, then the message listener should be null.
-        if (messageListener == null)
-            return;
+            // If the user prefers to poll the messages instead of receiving them
+            // via SendMessage, then the message listener should be null.
+            if (messageListener == null)
+                return;
 
-        // Read the next message from the queue
-        string message = (string)serialThread.ReadMessage();
-        if (message == null)
-            return;
-        UnityEngine.Debug.Log("msg: "+message);
-        // Check if the message is plain data or a connect/disconnect event.
-        if (ReferenceEquals(message, SERIAL_DEVICE_CONNECTED))
-            messageListener.SendMessage("OnConnectionEvent", true);
-        else if (ReferenceEquals(message, SERIAL_DEVICE_DISCONNECTED))
-            messageListener.SendMessage("OnConnectionEvent", false);
-        else
-            messageListener.SendMessage("OnMessageArrived", message);
-    }
-/*
+            // Read the next message from the queue
+            string message = (string)serialThread.ReadMessage();
+           
+            if (message == null)
+                return;
+            UnityEngine.Debug.Log("msg: " + message);
+            bool sucess = false;
+            int leituraInt=0;
+            try
+            {
+                leituraInt = (int)Convert.ToDouble(message);
+                UnityEngine.Debug.Log("msg: "+leituraInt);
+                sucess = true;
+            }catch(Exception e)
+            {
+                sucess = false;
+            }
+            if(sucess)
+                SlideEmbolo(leituraInt);
+
+            // Check if the message is plain data or a connect/disconnect event.
+            if (ReferenceEquals(message, SERIAL_DEVICE_CONNECTED))
+                messageListener.SendMessage("OnConnectionEvent", true);
+            else if (ReferenceEquals(message, SERIAL_DEVICE_DISCONNECTED))
+                messageListener.SendMessage("OnConnectionEvent", false);
+            else
+                messageListener.SendMessage("OnMessageArrived", message);
+        }
+        /*
         if(!isConnect){
            
                 foreach(string port in portNames){
