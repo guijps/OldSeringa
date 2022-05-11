@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<root>
+  <configs>
+    <config_toggle_dispositivo_haptico ValueType="bool">False</config_toggle_dispositivo_haptico>
+    <config_toggle_suporte_fisico ValueType="bool">False</config_toggle_suporte_fisico>
+    <config_toggle_arduino ValueType="bool">False</config_toggle_arduino>
+    <config_toggle_htcVive ValueType="bool">True</config_toggle_htcVive>
+    <config_toggle_oculusRift ValueType="bool">False</config_toggle_oculusRift>
+	<config_toggle_ARTracking ValueType="bool">True</config_toggle_ARTracking>
+    <arduinoPortName ValueType="string">COM4</arduinoPortName>
+    <config_timeOut_arduino ValueType="int">4</config_timeOut_arduino>
+    <calibra_cabeca_posicao_rotacao ValueType="string">Teste123</calibra_cabeca_posicao_rotacao>
+    <position_haptic_calibration_x ValueType="float">321</position_haptic_calibration_x>
+    <position_haptic_calibration_y ValueType="float">321</position_haptic_calibration_y>
+    <position_haptic_calibration_z ValueType="float">321</position_haptic_calibration_z>
+    <position_camera_x ValueType="float">0.366929</position_camera_x>
+    <position_camera_y ValueType="float">-0.1527801</position_camera_y>
+    <position_camera_z ValueType="float">1.40689</position_camera_z>
+    <rotation_camera_x ValueType="float">0.01920507</rotation_camera_x>
+    <rotation_camera_y ValueType="float">-0.2886052</rotation_camera_y>
+    <rotation_camera_z ValueType="float">-0.01147842</rotation_camera_z>
+    <rotation_camera_w ValueType="float">0.9571868</rotation_camera_w>
+  </configs>
+</root>
