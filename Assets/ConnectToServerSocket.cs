@@ -7,11 +7,12 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
-public class ConnectToServerSocket : MonoBehaviour {
+public class ConnectToServerSocket : MonoBehaviour
+{
 
 	#region private members 	
-	private TcpClient socketConnection; 	
-	private Thread clientReceiveThread; 	
+	private TcpClient socketConnection;
+	private Thread clientReceiveThread;
 	public int port = 9000;
 
 	#endregion
@@ -37,51 +38,60 @@ public class ConnectToServerSocket : MonoBehaviour {
 		public float rotation_forward_z;
 	}
 
-	TrackingInfoOBJ JsonInfo = new TrackingInfoOBJ();
-	float step = 1f;
-	float speed = 1;
+	public TrackingInfoOBJ JsonInfo = new TrackingInfoOBJ();
+	public float step = 1f;
+	public float speed = 1;
 	float oneDegreeRadian = (float)(Math.PI / 180);
 
-	void Start () {
+	void Start()
+	{
 		JsonInfo.success = false;
-		if(GameManager.ligaARtracking)
-			ConnectToTcpServer();     
-	}  	
+		if (GameManager.ligaARtracking)
+		{
+			ConnectToTcpServer();
+			GameManager.manager_instance.conexaoServerSocketAR = this;
+		}
+	}
 	// Update is called once per frame
-	void Update () {         
-		if (Input.GetKeyDown(KeyCode.Space) && GameManager.ligaARtracking) {             
-			SendMessage();         
-		}     
-	}  	
+	void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Space) && GameManager.ligaARtracking)
+		{
+			SendMessage();
+		}
+	}
 	/// <summary> 	
 	/// Setup socket connection. 	
 	/// </summary> 	
-	private void ConnectToTcpServer () { 		
-		try {  			
-			clientReceiveThread = new Thread (new ThreadStart(ListenForData)); 			
-			clientReceiveThread.IsBackground = true; 			
-			clientReceiveThread.Start();  		
-		} 		
-		catch (Exception e) { 			
-			Debug.Log("On client connect exception " + e); 		
-		} 	
+	private void ConnectToTcpServer()
+	{
+		try
+		{
+			clientReceiveThread = new Thread(new ThreadStart(ListenForData));
+			clientReceiveThread.IsBackground = true;
+			clientReceiveThread.Start();
+
+		}
+		catch (Exception e)
+		{
+			Debug.Log("On client connect exception " + e);
+		}
 	}
-    private void FixedUpdate()
-    {
+	private void FixedUpdate()
+	{
 		if (JsonInfo.success)
 		{
 			step = speed * Time.deltaTime;
-			print("Msg recebida:"+" Tx: " + JsonInfo.translation_x +" ;Ty: " + JsonInfo.translation_y + " ;Tz: " + JsonInfo.translation_z);
-		
-			transform.localPosition = new Vector3(-JsonInfo.translation_x/50, -JsonInfo.translation_y/50 ,-JsonInfo.translation_z/50);
-		
-			Vector3 up = new Vector3(JsonInfo.rotation_up_x, JsonInfo.rotation_up_y, JsonInfo.rotation_up_z);
-			Vector3 forward = new Vector3(JsonInfo.rotation_forward_x, JsonInfo.rotation_forward_y, JsonInfo.rotation_forward_z);
-			transform.localRotation = Quaternion.LookRotation(forward, up);		
-			
+			//print("Msg recebida:" + " Tx: " + (JsonInfo.translation_x/100) + " ;Ty: " +  (-JsonInfo.translation_y/100) + " ;Tz: " + (-JsonInfo.translation_z/100));
+			//transform.localPosition = new Vector3(-JsonInfo.translation_x / 100, -JsonInfo.translation_y / 100, -JsonInfo.translation_z / 100);
+			//Vector3 up = new Vector3(JsonInfo.rotation_up_x, JsonInfo.rotation_up_y, JsonInfo.rotation_up_z);
+			//Vector3 forward = new Vector3(JsonInfo.rotation_forward_x, JsonInfo.rotation_forward_y, JsonInfo.rotation_forward_z);
+			//transform.localRotation = Quaternion.LookRotation(forward, up);
+
 		}
 	}
-    private void ListenForData() {
+	private void ListenForData()
+	{
 		//UDP
 		UdpClient listener = new UdpClient(port);
 		IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, port);
@@ -95,10 +105,10 @@ public class ConnectToServerSocket : MonoBehaviour {
 
 				//print($"Received broadcast from {groupEP} :");
 				string msg = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
-				
-				JsonInfo = JsonUtility.FromJson<TrackingInfoOBJ>(msg);			
-			
-				
+
+				JsonInfo = JsonUtility.FromJson<TrackingInfoOBJ>(msg);
+
+
 				//formatacao do JSON
 				//{"timestamp": 1602183586.0879989, "success": 1, "tx": 80.96737370851973, "ty": -57.617939220089404, "tz": 145.4147766817202, "rx": 2.9612484489575275, "ry": 0.05042517689604442, "rz": 0.3664380639308892}
 			}
@@ -135,33 +145,38 @@ public class ConnectToServerSocket : MonoBehaviour {
 		catch (SocketException socketException) {             
 			Debug.Log("Socket exception: " + socketException);         
 		}   */
-	}  	
+	}
 	/// <summary> 	
 	/// Send message to server using socket connection. 	
 	/// </summary> 	
-	private void SendMessage() {         
-		if (socketConnection == null) {             
-			return;         
-		}  		
-		try { 			
+	private void SendMessage()
+	{
+		if (socketConnection == null)
+		{
+			return;
+		}
+		try
+		{
 			// Get a stream object for writing. 			
-			NetworkStream stream = socketConnection.GetStream(); 			
-			if (stream.CanWrite) {                 
-				string clientMessage = "This is a message from one of your clients."; 				
+			NetworkStream stream = socketConnection.GetStream();
+			if (stream.CanWrite)
+			{
+				string clientMessage = "This is a message from one of your clients.";
 				// Convert string message to byte array.                 
-				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage); 				
+				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
 				// Write byte array to socketConnection stream.                 
-				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);                 
-				Debug.Log("Client sent his message - should be received by server");             
-			}         
-		} 		
-		catch (SocketException socketException) {             
-			Debug.Log("Socket exception: " + socketException);         
-		}     
+				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
+				Debug.Log("Client sent his message - should be received by server");
+			}
+		}
+		catch (SocketException socketException)
+		{
+			Debug.Log("Socket exception: " + socketException);
+		}
 	}
 
-    private void OnApplicationQuit()
-    {
+	private void OnApplicationQuit()
+	{
 		clientReceiveThread.Abort();
 
 	}
