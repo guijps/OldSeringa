@@ -63,7 +63,7 @@ public class SerialController : MonoBehaviour
     
     private Vector3 distEmboloInit;
     [Tooltip("Port name with which the SerialPort object will be created.")]
-    public string portName = "COM3";
+    public string portName;
     string[] portNames = SerialPort.GetPortNames(); 
     //string[] portNamess = {"COM1","COM2","COM3","COM4","COM5"};
 
@@ -104,6 +104,7 @@ public class SerialController : MonoBehaviour
     {
         distEmbolo = (fimEmbolo.position - embolo.position).normalized;
         distEmboloInit = (fimEmbolo.position - embolo.position);
+        print("Se quiser debugar as mensagens, vÃ¡ na linha 220 deste cÃ³digo.");
         
     }
     void SlideEmbolo(int leitura)
@@ -113,13 +114,13 @@ public class SerialController : MonoBehaviour
             print("favor, recalibrar a seringa");
             leitura = 100;
         }
-        //0 está para o fim assim como o máximo está para o inicio 
+        //0 estï¿½ para o fim assim como o mï¿½ximo estï¿½ para o inicio 
         embolo.position= (-fimEmbolo.position + inicioEmbolo.position)*leitura / 100 + fimEmbolo.position;
 
     }
     void OnEnable()
     {
-       string  port = "COM6";
+       string  port = portName;
         var serialPort = new SerialPort(port, 9600, 0, 8, StopBits.One);
         serialPort.ReadTimeout = 100;
         serialPort.Open();
@@ -216,8 +217,8 @@ public class SerialController : MonoBehaviour
             int leituraInt=0;
             try
             {
-                leituraInt = (int)Convert.ToDouble(message);
-                UnityEngine.Debug.Log("msg: "+leituraInt);
+                leituraInt = 100 - (int)Convert.ToDouble(message);
+                //UnityEngine.Debug.Log("msg: "+leituraInt);
                 sucess = true;
             }catch(Exception e)
             {
@@ -286,8 +287,9 @@ public class SerialController : MonoBehaviour
     //Bloco feito para configurar a potencia do vibra do arduino (niveis de 0 a 9)
     private void RespondtoCommands(){
         if(isConnect){
-            if(Input.GetKeyDown(KeyCode.Alpha0))
+            if(Input.GetKeyDown(KeyCode.Alpha0)){
                 SendSerialMessage("0");
+            }
             if(Input.GetKeyDown(KeyCode.Alpha1))
                 SendSerialMessage("1");
             if(Input.GetKeyDown(KeyCode.Alpha2))

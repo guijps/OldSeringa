@@ -240,8 +240,8 @@ void loop() {
   range = maximo - minimo;
   cheio = 100 * (pot - minimo) / range;
   nivel = nivelar(seringa, pot); 
-  Serial.println(nivel);              
-  
+  Serial.println(nivel);  
+ 
   
   delay(60);
 }

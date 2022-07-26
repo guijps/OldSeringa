@@ -13,6 +13,7 @@ public class ConnectToServerSocket : MonoBehaviour
 	#region private members 	
 	private TcpClient socketConnection;
 	private Thread clientReceiveThread;
+	public ARControl arRef;
 	public int port = 9000;
 
 	#endregion
@@ -45,11 +46,13 @@ public class ConnectToServerSocket : MonoBehaviour
 
 	void Start()
 	{
+		
 		JsonInfo.success = false;
 		if (GameManager.ligaARtracking)
 		{
 			ConnectToTcpServer();
 			GameManager.manager_instance.conexaoServerSocketAR = this;
+			arRef.funcaoRemendo();
 		}
 	}
 	// Update is called once per frame
