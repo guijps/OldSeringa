@@ -109,13 +109,16 @@ public class SerialController : MonoBehaviour
     }
     void SlideEmbolo(int leitura)
     {
+        
         if (leitura > 100)
         {
             print("favor, recalibrar a seringa");
             leitura = 100;
+           
         }
+        int  _leitura=leitura;
         //0 est� para o fim assim como o m�ximo est� para o inicio 
-        embolo.position= (-fimEmbolo.position + inicioEmbolo.position)*leitura / 100 + fimEmbolo.position;
+        embolo.position= (-fimEmbolo.position + inicioEmbolo.position)*_leitura / 100 + fimEmbolo.position;
 
     }
     void OnEnable()
