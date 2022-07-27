@@ -4,6 +4,7 @@ using UnityEngine;
 public class MyMessageListener : MonoBehaviour {
  // Use this for initialization
  void Start () {
+    Debug.Log("Venha neste código para ativar um PRINT de dados");
  }
  // Update is called once per frame
  void Update () {
@@ -11,13 +12,13 @@ public class MyMessageListener : MonoBehaviour {
  // Invoked when a line of data is received from the serial device.
  void OnMessageArrived(string msg)
  {
- Debug.Log("Arrived: " + msg);
+ //Debug.Log("Arrived: " + msg);
  }
  // Invoked when a connect/disconnect event occurs. The parameter 'success'
  // will be 'true' upon connection, and 'false' upon disconnection or
  // failure to connect.
  void OnConnectionEvent(bool success)
  {
- Debug.Log(success ? "Device connected" : "Device disconnected");
+    Debug.Log(success ? "Device connected" : "Device disconnected");
  }
 }

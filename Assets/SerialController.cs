@@ -93,6 +93,7 @@ public class SerialController : MonoBehaviour
     // Internal reference to the Thread and the object that runs in it.
     protected Thread thread;
     protected SerialThreadLines serialThread;
+    public SerialPort serialPort;
 
 
     // ------------------------------------------------------------------------
@@ -124,7 +125,7 @@ public class SerialController : MonoBehaviour
     void OnEnable()
     {
        string  port = portName;
-        var serialPort = new SerialPort(port, 9600, 0, 8, StopBits.One);
+        serialPort = new SerialPort(port, 9600, 0, 8, StopBits.One);
         serialPort.ReadTimeout = 100;
         serialPort.Open();
    
@@ -215,7 +216,7 @@ public class SerialController : MonoBehaviour
            
             if (message == null)
                 return;
-            UnityEngine.Debug.Log("msg: " + message);
+            //UnityEngine.Debug.Log("msg: " + message);
             bool sucess = false;
             int leituraInt=0;
             try
@@ -292,9 +293,13 @@ public class SerialController : MonoBehaviour
         if(isConnect){
             if(Input.GetKeyDown(KeyCode.Alpha0)){
                 SendSerialMessage("0");
+                print("0");
             }
-            if(Input.GetKeyDown(KeyCode.Alpha1))
-                SendSerialMessage("1");
+            if(Input.GetKeyDown(KeyCode.Alpha1)){
+                 SendSerialMessage("1");
+                 print("0");
+            }
+               
             if(Input.GetKeyDown(KeyCode.Alpha2))
                 SendSerialMessage("2");
             if(Input.GetKeyDown(KeyCode.Alpha3))
@@ -309,8 +314,11 @@ public class SerialController : MonoBehaviour
                 SendSerialMessage("7");
             if(Input.GetKeyDown(KeyCode.Alpha8))
                 SendSerialMessage("8");
-            if(Input.GetKeyDown(KeyCode.Alpha9))
+            if(Input.GetKeyDown(KeyCode.Alpha9)){
                 SendSerialMessage("9");
+                print("9");
+            }
+                
 
 
             //Bloco feito para simular o uso da vibracao continua do vibra (a principio nao utilizado no vibra)
@@ -348,12 +356,21 @@ public class SerialController : MonoBehaviour
             seringaDentro = false;
         }
         catch(System.Exception){}
-    }     
+    }   
+   
+   //garante que a porta fique fechada após o uso do unity
+    private void OnApplicationQuit() {
+ 
+        if(thread.IsAlive)
+        {
+            thread.Abort();
+        }
+
+      serialPort.Close();
+    }
 
 
     
-
-
 
 
 
