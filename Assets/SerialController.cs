@@ -358,19 +358,7 @@ public class SerialController : MonoBehaviour
         catch(System.Exception){}
     }   
    
-   //garante que a porta fique fechada após o uso do unity
-    private void OnApplicationQuit() {
- 
-        if(thread.IsAlive)
-        {
-            thread.Abort();
-        }
 
-      serialPort.Close();
-    }
-
-
-    
 
 
 

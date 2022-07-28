@@ -157,8 +157,11 @@ void vibracao(int comunicacao){   /*Trata toda a vibracao comandada no serial*/
   else if(comunicacao >= 49){       /*Regula a forca da vibracao do motor (recebe niveis de 1 a 9 em ascii)*/
     if(comunicacao <= 57){
       potenciaVibra = ((comunicacao - 48)*21 + 66);    /*49 == 1 em ascii,com um nivel minimo de 66+21 para funcionamento correto do vibra (opera bem entre 1 e 3.3V), no maior nivel tem a tensao max = 255*/
-      analogWrite(11,potenciaVibra);
-      vibrando = true;
+      if(vibrando){
+        analogWrite(11,potenciaVibra);
+      }
+      
+      
   
     }
   }
