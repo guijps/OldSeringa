@@ -41,6 +41,7 @@ public class SerialController : MonoBehaviour
     bool seringaDentro = false;
     bool isConnect = false;
     bool portaAberta = false;
+    private string message;
     Vector3 posicao;
     float diferenca;
     //bool novaPosicao = true;                                //evita que a co-rotina seja chamada indiscriminadamente
@@ -64,7 +65,7 @@ public class SerialController : MonoBehaviour
     private Vector3 distEmboloInit;
     [Tooltip("Port name with which the SerialPort object will be created.")]
     public string portName;
-    string[] portNames = SerialPort.GetPortNames(); 
+    public string[] portNames = SerialPort.GetPortNames(); 
     //string[] portNamess = {"COM1","COM2","COM3","COM4","COM5"};
 
     [Tooltip("Baud rate that the serial device is using to transmit data.")]
@@ -124,15 +125,15 @@ public class SerialController : MonoBehaviour
     }
     void OnEnable()
     {
-       string  port = portName;
-        serialPort = new SerialPort(port, 9600, 0, 8, StopBits.One);
-        serialPort.ReadTimeout = 100;
-        serialPort.Open();
-   
+       serialThread = new SerialThreadLines(portName, 
+                                                 baudRate, 
+                                                 reconnectionDelay,
+                                                 maxUnreadMessages);
+            thread = new Thread(new ThreadStart(serialThread.RunForever));
+            thread.Start();
+            portaAberta = false;
+            isConnect = true;
         
-        portaAberta = true;
-        portName = port;
-       
 
     }
 
@@ -212,7 +213,7 @@ public class SerialController : MonoBehaviour
                 return;
 
             // Read the next message from the queue
-            string message = (string)serialThread.ReadMessage();
+            message  = (string)serialThread.ReadMessage();
            
             if (message == null)
                 return;
